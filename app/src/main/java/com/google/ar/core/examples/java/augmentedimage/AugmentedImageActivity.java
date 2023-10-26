@@ -24,6 +24,7 @@ import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.Pair;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -85,6 +86,7 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
 
   private final BackgroundRenderer backgroundRenderer = new BackgroundRenderer();
   private final AugmentedImageRenderer augmentedImageRenderer = new AugmentedImageRenderer();
+  private boolean shouldHideImage = false;
 
   private boolean shouldConfigureSession = false;
 
@@ -95,6 +97,14 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
   // the
   // database.
   private final Map<Integer, Pair<AugmentedImage, Anchor>> augmentedImageMap = new HashMap<>();
+
+
+  @Override
+  public boolean onTouchEvent(MotionEvent event) {
+    shouldHideImage = !shouldHideImage;
+
+    return super.onTouchEvent(event);
+  }
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -359,8 +369,10 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
       Anchor centerAnchor = augmentedImageMap.get(augmentedImage.getIndex()).second;
       switch (augmentedImage.getTrackingState()) {
         case TRACKING:
-          augmentedImageRenderer.draw(
-              viewmtx, projmtx, augmentedImage, centerAnchor, colorCorrectionRgba);
+          if (!shouldHideImage) {
+            augmentedImageRenderer.draw(
+                    viewmtx, projmtx, augmentedImage, centerAnchor, colorCorrectionRgba);
+          }
           break;
         default:
           break;
