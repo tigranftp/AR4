@@ -87,6 +87,7 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
   private final BackgroundRenderer backgroundRenderer = new BackgroundRenderer();
   private final AugmentedImageRenderer augmentedImageRenderer = new AugmentedImageRenderer();
   private boolean shouldHideImage = false;
+  private double offset = 0.0;
 
   private boolean shouldConfigureSession = false;
 
@@ -101,7 +102,16 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
 
   @Override
   public boolean onTouchEvent(MotionEvent event) {
-    shouldHideImage = !shouldHideImage;
+    float x = event.getX();
+    float y = event.getY();
+
+    float width = this.getResources().getDisplayMetrics().widthPixels;
+    if (x <= width/2) {
+      offset -= 0.01;
+    } else {
+      offset += 0.01;
+    }
+
 
     return super.onTouchEvent(event);
   }
@@ -369,10 +379,9 @@ public class AugmentedImageActivity extends AppCompatActivity implements GLSurfa
       Anchor centerAnchor = augmentedImageMap.get(augmentedImage.getIndex()).second;
       switch (augmentedImage.getTrackingState()) {
         case TRACKING:
-          if (!shouldHideImage) {
+            projmtx[12] += offset;
             augmentedImageRenderer.draw(
                     viewmtx, projmtx, augmentedImage, centerAnchor, colorCorrectionRgba);
-          }
           break;
         default:
           break;
